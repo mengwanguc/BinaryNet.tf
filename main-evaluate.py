@@ -7,7 +7,8 @@ from progress.bar import Bar
 from datetime import datetime
 from tensorflow.python.platform import gfile
 from data import *
-from evaluate import evaluate
+from evaluatetime import evaluate
+import time
 
 timestr = '-'.join(str(x) for x in list(tuple(datetime.now().timetuple())[:6]))
 MOVING_AVERAGE_DECAY = 0.997
