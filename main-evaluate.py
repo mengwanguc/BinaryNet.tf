@@ -1,3 +1,4 @@
+import models
 import tensorflow as tf
 import importlib
 import tensorflow.python.platform
@@ -8,6 +9,7 @@ from datetime import datetime
 from tensorflow.python.platform import gfile
 from data import *
 from evaluatetime import evaluate
+from evaluatetimeonly import evaluate as evaluatetimeonly
 import time
 
 timestr = '-'.join(str(x) for x in list(tuple(datetime.now().timetuple())[:6]))
@@ -199,7 +201,7 @@ def train(model, data,
         print('Training Loss: %.3f' % loss_value)
 
         test_acc, test_loss = evaluate(model, FLAGS.dataset,
-                                       batch_size=batch_size,
+                                       batch_size=32,
                                        checkpoint_dir=checkpoint_dir)  # ,
         # log_dir=log_dir)
         print('Test Accuracy: %.3f' % test_acc)
@@ -211,6 +213,12 @@ def train(model, data,
         summary_out.value.add(tag='loss/test', simple_value=test_loss)
         summary_writer.add_summary(summary_out, step)
         summary_writer.flush()
+
+    pred = evaluatetimeonly(model, FLAGS.dataset,
+                 batch_size=32,
+                 checkpoint_dir=checkpoint_dir)
+
+
 
     # When done, ask the threads to stop.
     coord.request_stop()

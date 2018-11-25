@@ -21,12 +21,12 @@ def evaluate(model, dataset,
             x, yt = data.generate_batches(batch_size)
             is_training = tf.placeholder(tf.bool,[],name='is_training')
 
-        # Build the Graph that computes the logits predictions
-        y = model(x, is_training=False)
+            # Build the Graph that computes the logits predictions
+            y = model(x, is_training=False)
 
         # Calculate predictions.
-        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=yt, logits=y))
-        accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(y,yt,1), tf.float32))
+#        loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=yt, logits=y))
+#        accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(y,yt,1), tf.float32))
 
         # Restore the moving average version of the learned variables for eval.
         #variable_averages = tf.train.ExponentialMovingAverage(
@@ -67,9 +67,10 @@ def evaluate(model, dataset,
             bar = Bar('Evaluating', max=num_batches,suffix='%(percent)d%% eta: %(eta)ds')
             begin_time = time.time()
             while step < num_batches and not coord.should_stop():
-              acc_val, loss_val = sess.run([accuracy, loss])
-              total_acc += acc_val
-              total_loss += loss_val
+         #     acc_val, loss_val = sess.run([accuracy, loss])
+              pred = sess.run([y])
+         #     total_acc += acc_val
+         #     total_loss += loss_val
               step += 1
               bar.next()
             bar.finish()
@@ -77,12 +78,14 @@ def evaluate(model, dataset,
             end_time = time.time()
 
             # Compute precision and loss
-            total_acc /= num_batches
-            total_loss /= num_batches
+          #  total_acc /= num_batches
+          #  total_loss /= num_batches
             total_time = end_time - begin_time
             avg_time = total_time / num_batches
-            print('Test num: %d  Accuracy: %.3f  Loss: %.3f  Total Time: %.3f  avg time: %.3f' %
-                  (num_batches, total_acc, total_loss, total_time, avg_time))
+#            print('Test num: %d  Accuracy: %.3f  Loss: %.3f  Total Time: %.3f  avg time: %.3f' %
+#                  (num_batches, total_acc, total_loss, total_time, avg_time))
+            print('Test num: %d  Total Time: %.3f  avg time: %.3f' %
+                  (num_batches, total_time, avg_time))
 
 
 
@@ -91,7 +94,7 @@ def evaluate(model, dataset,
 
         coord.request_stop()
         coord.join(threads)
-        return total_acc, total_loss
+        return pred
 
 def main(argv=None):  # pylint: disable=unused-argument
   evaluate()
